@@ -30,14 +30,15 @@ const isFunction = (target: any): boolean => {
     return typeof target === 'function';
 };
 
+let guid = 0;
+
 export class Paparazzo {
 
     // 存储事件处理器集合或事件处理器与事件名的map集合，
     // key为事件名，value为事件处理器集合或事件处理器
     private eventsMap: EventsMap = {};
 
-    // 存储一次性事件处理器集合或事件处理器与事件名的map集合
-    private onceEvenstMap: EventsMap = {};
+    private handlerGuidsMap: { [propName: string]: any } = {};
 
     // 配置对象
     private config: Config = {
@@ -84,15 +85,22 @@ export class Paparazzo {
                 } else {
                     handlers = handler;
                 }
-                if (isFunction(handler)) {
-                    if (prepend) {
-                        this.eventsMap[name] = (handlers || []).concat(this.eventsMap[name] || []);
-                    } else {
-                        this.eventsMap[name] = ((this.eventsMap[name] || []) as EventHandler[]).concat(handlers);
-                    }
-                    if (once && !this.onceEvenstMap.hasOwnProperty(name)) {
-                        this.onceEvenstMap[name] = this.eventsMap[name];
-                    }
+                handlers = handlers.filter(fn => isFunction(fn));
+                if (once) {
+                    handlers = handlers.map((fn) => {
+                        const onceFn = (...args: any[]) => {
+                            fn(...args);
+                            this.off(name, fn);
+                        };
+                        this.handlerGuidsMap[`${++guid}`] = onceFn;
+                        (fn as any)['_guid'] = `${guid}`;
+                        return onceFn;
+                    });
+                }
+                if (prepend) {
+                    this.eventsMap[name] = (handlers || []).concat(this.eventsMap[name] || []);
+                } else {
+                    this.eventsMap[name] = ((this.eventsMap[name] || []) as EventHandler[]).concat(handlers);
                 }
             });
         return this;
@@ -224,25 +232,35 @@ export class Paparazzo {
     public emmiter(eventName: string, payload?: any): Paparazzo {
         return this.processEvents(eventName, (name: string, handler: EventHandler, payload: any) => {
             handler(payload);
-            // 如果是一次性事件，触发事件后将事件从事件队列中移除
-            if (this.onceEvenstMap[name]) {
-                delete this.onceEvenstMap[name];
-                delete this.eventsMap[name];
-            }
         }, payload);
     }
 
     /**
      * 对指定事件进行移除
      * @param eventName 事件名，如果需要对多个事件名进行触发时，可以用事件分隔符隔开，默认为空格
+     * @param handler 需要移除的处理器集合或处理器
      */
-    public off(eventName: string): Paparazzo {
-        return this.processEvents(eventName, (name: string) => {
-            delete this.eventsMap[name];
-            if (this.onceEvenstMap[name]) {
-                delete this.onceEvenstMap[name];
-            }
-        });
+    public off(eventName: string, handler?: EventHandler[] | EventHandler): Paparazzo {
+        let eventsMap: EventHandler[] = this.eventsMap[eventName] as EventHandler[];
+        if (!handler) {
+            this.splitEventNames(eventName).forEach((name: string) => {
+                delete this.eventsMap[name];
+            });
+        } else {
+            const targetHandlers = Array.isArray(handler) ? handler : [handler];
+            this.splitEventNames(eventName).forEach((name: string) => {
+                targetHandlers.forEach((targetHandler) => {
+                    const guid = (targetHandler as any)['_guid'];
+                    const originFn = this.handlerGuidsMap[guid];
+                    const index = eventsMap.indexOf(originFn ? originFn : targetHandler);
+                    if (index > -1) {
+                        this.eventsMap[name] = eventsMap = eventsMap.slice(0, index).concat(eventsMap.slice(index + 1));
+                        delete this.handlerGuidsMap[guid];
+                    }
+                });
+            });
+        }
+        return this;
     }
 
     /**
@@ -250,13 +268,6 @@ export class Paparazzo {
      */
     public eventNames(): string[] {
         return Object.keys(this.eventsMap);
-    }
-
-    /**
-     * 获取全部监听的事件名
-     */
-    public onceEventNames(): string[] {
-        return Object.keys(this.onceEvenstMap);
     }
 
     /**

@@ -8,7 +8,7 @@ interface Config {
 }
 export declare class Paparazzo {
     private eventsMap;
-    private onceEvenstMap;
+    private handlerGuidsMap;
     private config;
     constructor(config?: Config);
     private splitEventNames;
@@ -23,9 +23,8 @@ export declare class Paparazzo {
     once(eventName: string, handlers: EventHandler[] | EventHandler): Paparazzo;
     once(eventHandlersMap: EventsMap): Paparazzo;
     emmiter(eventName: string, payload?: any): Paparazzo;
-    off(eventName: string): Paparazzo;
+    off(eventName: string, handler?: EventHandler[] | EventHandler): Paparazzo;
     eventNames(): string[];
-    onceEventNames(): string[];
     listeners(eventName: string): EventHandler[];
 }
 export {};
