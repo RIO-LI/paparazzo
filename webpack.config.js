@@ -1,11 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 
-module.exports = function(env) {
+module.exports = function (env) {
   const productionBuild = env === 'production';
   const filename = `paparazzo${productionBuild ? '.min' : ''}.js`;
   const plugins = productionBuild ?
-    [new webpack.optimize.UglifyJsPlugin({sourceMap: true})] :
+    [new webpack.optimize.UglifyJsPlugin({ sourceMap: true })] :
     [];
 
   return {

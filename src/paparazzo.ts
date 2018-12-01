@@ -30,7 +30,7 @@ const isFunction = (target: any): boolean => {
     return typeof target === 'function';
 };
 
-class Paparazzo {
+export class Paparazzo {
 
     // 存储事件处理器集合或事件处理器与事件名的map集合，
     // key为事件名，value为事件处理器集合或事件处理器
