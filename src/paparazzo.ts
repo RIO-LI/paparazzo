@@ -135,15 +135,14 @@ export class Paparazzo {
      * 对指定事件进行监听
      */
     public on(...args: any[]): Paparazzo {
-        const argsLength = args.length;
-        if (argsLength === 1 && isObject(args[0])) {
+        if (isObject(args[0])) {
             const eventsMap: EventsMap = args[0];
             const once: boolean = !!args[1];
             const prepend: boolean = !!args[2];
             Object.keys(eventsMap).forEach((eventName: string) => {
                 this.addEventHandlers(eventName, eventsMap[eventName], once, prepend);
             });
-        } else if (argsLength === 2) {
+        } else {
             const eventNames: string = args[0];
             const handlers: EventHandler[] | EventHandler = args[1];
             const once: boolean = !!args[2];
