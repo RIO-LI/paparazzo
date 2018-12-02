@@ -1,5 +1,7 @@
 {
   "name": "paparazzo",
+  "author": "rioli",
+  "description": "A simple, elegant and powerful event module that helps you quickly observe specific events, just like a paparazzi tracking celebrities",
   "files": [
     "lib/"
   ],
