@@ -61,17 +61,17 @@ const pz = new Paparazzo();
 ## API
 
 -----------------------------------------------
-### on(eventName, [handlers], [once], [prepend])
+### on(eventName, handlers, [once], [prepend])
 
 ### on(eventHandlersMap, [once], [prepend])
 
-### once(eventName: string, handlers)
+### once(eventName, handlers)
 
 ### once(eventHandlersMap)
 
 ### emmiter(eventName, [payload]);
 
-### off(eventName: string, [handlers]);
+### off(eventName, [handlers]);
 
 ### prependListener(eventName, handlers, [once])
 
