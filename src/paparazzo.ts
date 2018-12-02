@@ -2,12 +2,18 @@
 type EventHandler = (payload?: any) => void;
 
 // 事件哈希集合类型
-interface EventsMap {
-    [propName: string]: EventHandler[] | EventHandler;
+interface IEventsMap {
+    [propName: string]: IEventMapItem[];
+}
+
+interface IEventMapItem {
+    handler: EventHandler;
+    originHandler: EventHandler;
+    [propName: string]: any;
 }
 
 // Paparazzo实例对象配置类型
-interface Config {
+interface IConfig {
     separator?: string; // 事件名分隔符
     [propName: string]: any;
 }
@@ -30,22 +36,18 @@ const isFunction = (target: any): boolean => {
     return typeof target === 'function';
 };
 
-let guid = 0;
-
 export class Paparazzo {
 
     // 存储事件处理器集合或事件处理器与事件名的map集合，
     // key为事件名，value为事件处理器集合或事件处理器
-    private eventsMap: EventsMap = {};
-
-    private handlerGuidsMap: { [propName: string]: any } = {};
+    private eventsMap: IEventsMap = {};
 
     // 配置对象
-    private config: Config = {
+    private config: IConfig = {
         separator: ' ', // 事件名分隔符
     };
 
-    constructor(config?: Config) {
+    constructor(config?: IConfig) {
         if (isObject(config)) {
             this.config = (Object as any).assign(this.config, config);
         }
@@ -85,22 +87,24 @@ export class Paparazzo {
                 } else {
                     handlers = handler;
                 }
-                handlers = handlers.filter(fn => isFunction(fn));
-                if (once) {
-                    handlers = handlers.map((fn) => {
-                        const onceFn = (...args: any[]) => {
-                            fn(...args);
+                const queue = handlers.filter((fn) => isFunction(fn)).map((fn) => {
+                    const item = {
+                        originHandler: fn,
+                        handler: fn,
+                    };
+                    if (once) {
+                        item.handler = (...args: any[]) => {
                             this.off(name, fn);
+                            fn(...args);
                         };
-                        this.handlerGuidsMap[`${++guid}`] = onceFn;
-                        (fn as any)['_guid'] = `${guid}`;
-                        return onceFn;
-                    });
-                }
+                    }
+                    return item;
+                });
+
                 if (prepend) {
-                    this.eventsMap[name] = (handlers || []).concat(this.eventsMap[name] || []);
+                    this.eventsMap[name] = queue.concat(this.eventsMap[name]);
                 } else {
-                    this.eventsMap[name] = ((this.eventsMap[name] || []) as EventHandler[]).concat(handlers);
+                    this.eventsMap[name] = (this.eventsMap[name]).concat(queue);
                 }
             });
         return this;
@@ -115,8 +119,8 @@ export class Paparazzo {
     private processEvents(eventName: string, process: any, ...args: any[]): Paparazzo {
         this.splitEventNames(eventName)
             .forEach((name: string) => {
-                (this.eventsMap[name] as EventHandler[] || []).forEach((handler: EventHandler) => {
-                    process(name, handler, ...args);
+                (this.eventsMap[name] || []).forEach((handler) => {
+                    process(name, handler.handler, ...args);
                 });
             });
         return this;
@@ -137,14 +141,14 @@ export class Paparazzo {
      * @param once 是否只监听一次,true 表示是，false表示不是
      * @param prepend 是否将处理器添加到该事件处理器队列的最前方，true 表示是，false表示不是，默认为false
      */
-    public on(eventHandlersMap: EventsMap, once?: boolean, prepend?: boolean): Paparazzo;
+    public on(eventHandlersMap: IEventsMap, once?: boolean, prepend?: boolean): Paparazzo;
 
     /**
      * 对指定事件进行监听
      */
     public on(...args: any[]): Paparazzo {
         if (isObject(args[0])) {
-            const eventsMap: EventsMap = args[0];
+            const eventsMap: { [propName: string]: EventHandler[] | EventHandler } = args[0];
             const once: boolean = !!args[1];
             const prepend: boolean = !!args[2];
             Object.keys(eventsMap).forEach((eventName: string) => {
@@ -173,7 +177,7 @@ export class Paparazzo {
      * @param eventHandlersMap 事件集合对象，键为要监听的事件名，值为对应事件处理器
      * @param once 是否只监听一次
      */
-    public prependListener(eventHandlersMap: EventsMap, once?: boolean): Paparazzo;
+    public prependListener(eventHandlersMap: IEventsMap, once?: boolean): Paparazzo;
 
     /**
      * 对事件进行监听，并将处理器添加到该事件处理器队列的最前方
@@ -194,7 +198,7 @@ export class Paparazzo {
      * 对事件进行一次性监听，并将处理器添加到该事件处理器队列的最前方
      * @param eventHandlersMap 事件集合对象，键为要监听的事件名，值为对应事件处理器
      */
-    public prependOnceListener(eventHandlersMap: EventsMap): Paparazzo;
+    public prependOnceListener(eventHandlersMap: IEventsMap): Paparazzo;
 
     /**
      * 对事件进行一次性监听，并将处理器添加到该事件处理器队列的最前方
@@ -214,7 +218,7 @@ export class Paparazzo {
      * 对事件集合进行监听
      * @param eventHandlersMap 事件集合对象，键为要监听的事件名，值为对应事件处理器
      */
-    public once(eventHandlersMap: EventsMap): Paparazzo;
+    public once(eventHandlersMap: IEventsMap): Paparazzo;
 
     /**
      * 对指定事件进行一次性监听，当事件触发后，事件将从事件处理中移除
@@ -241,7 +245,7 @@ export class Paparazzo {
      * @param handler 需要移除的处理器集合或处理器
      */
     public off(eventName: string, handler?: EventHandler[] | EventHandler): Paparazzo {
-        let eventsMap: EventHandler[] = this.eventsMap[eventName] as EventHandler[];
+        let eventsMap: IEventMapItem[] = (this.eventsMap[eventName] || []);
         if (!handler) {
             this.splitEventNames(eventName).forEach((name: string) => {
                 delete this.eventsMap[name];
@@ -250,12 +254,12 @@ export class Paparazzo {
             const targetHandlers = Array.isArray(handler) ? handler : [handler];
             this.splitEventNames(eventName).forEach((name: string) => {
                 targetHandlers.forEach((targetHandler) => {
-                    const guid = (targetHandler as any)['_guid'];
-                    const originFn = this.handlerGuidsMap[guid];
-                    const index = eventsMap.indexOf(originFn ? originFn : targetHandler);
-                    if (index > -1) {
-                        this.eventsMap[name] = eventsMap = eventsMap.slice(0, index).concat(eventsMap.slice(index + 1));
-                        delete this.handlerGuidsMap[guid];
+                    const size = eventsMap.length;
+                    for (let i = 0; i < size; i++) {
+                        if (eventsMap[i]['originHandler'] === targetHandler) {
+                            this.eventsMap[name] = eventsMap = eventsMap.slice(0, i).concat(eventsMap.slice(i + 1));
+                            break;
+                        }
                     }
                 });
             });
@@ -275,6 +279,6 @@ export class Paparazzo {
      * @param eventName 事件名
      */
     public listeners(eventName: string): EventHandler[] {
-        return this.eventsMap[eventName] as EventHandler[] || [];
+        return (this.eventsMap[eventName] || []).map((item) => item.originHandler);
     }
 }
