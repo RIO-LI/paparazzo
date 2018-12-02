@@ -1,5 +1,5 @@
 {
-  "name": "paparazzo",
+  "name": "hk-paparazzo",
   "author": "rioli",
   "description": "A simple, elegant and powerful event module that helps you quickly observe specific events, just like a paparazzi tracking celebrities",
   "files": [
@@ -21,7 +21,7 @@
     "release:major": "npm run clean && npm version major",
     "test": "karma start"
   },
-  "version": "0.0.1",
+  "version": "0.0.5",
   "dependencies": {},
   "devDependencies": {
     "istanbul": "^0.4.5",
