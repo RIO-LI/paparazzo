@@ -10,8 +10,9 @@
   "scripts": {
     "build:dev": "webpack",
     "build:prod": "webpack --env=production",
-    "build": "npm run build:dev && npm run build:prod",
-    "clean": "rimraf lib coverage",
+    "build:es6": "tsc -m es2015 --outDir esm --declarationDir ../esm",
+    "build": "npm run build:dev && npm run build:prod && npm run build:es6",
+    "clean": "rimraf lib coverage && rimraf esm coverage",
     "lint": "tslint \"src/**/*.ts\"",
     "preversion": "npm test -- --single-run",
     "version": "npm run build && git add -A -f lib",
@@ -21,7 +22,7 @@
     "release:major": "npm run clean && npm version major",
     "test": "karma start"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "dependencies": {},
   "devDependencies": {
     "istanbul": "^0.4.5",
