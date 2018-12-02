@@ -49,5 +49,6 @@
     "@types/sinon": "^2.1.2",
     "@types/sinon-chai": "^2.7.27"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/RIO-LI/paparazzo"
 }
