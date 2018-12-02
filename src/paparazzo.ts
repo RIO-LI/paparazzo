@@ -58,8 +58,10 @@ export class Paparazzo {
      * @param eventName 事件名
      */
     private splitEventNames(eventName: string): string[] {
-        const names: string[] = eventName.split(this.config.separator ? this.config.separator : ' ');
-        names.filter((name: string) => {
+        let names: string[] = eventName.split(this.config.separator ? this.config.separator : ' ');
+        names = names.map((name: string) => {
+            return name.trim();
+        }).filter((name: string) => {
             return (name.trim()).length > 0;
         });
         return names;
