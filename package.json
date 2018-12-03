@@ -22,7 +22,7 @@
     "release:major": "npm run clean && npm version major",
     "test": "karma start"
   },
-  "version": "0.0.6",
+  "version": "0.0.7",
   "dependencies": {},
   "devDependencies": {
     "istanbul": "^0.4.5",

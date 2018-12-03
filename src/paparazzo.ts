@@ -189,8 +189,11 @@ export class Paparazzo {
      * 对事件进行监听，并将处理器添加到该事件处理器队列的最前方
      */
     public prependListener(...args: any[]): Paparazzo {
-        this.on.call(this, args[0], args[1], args[2], true);
-        return this;
+        if (isObject(args[0])) {
+            return this.on.call(this, args[0], args[1], true);
+        } else {
+            return this.on.call(this, args[0], args[1], args[2], true);
+        }
     }
 
     /**
@@ -210,7 +213,11 @@ export class Paparazzo {
      * 对事件进行一次性监听，并将处理器添加到该事件处理器队列的最前方
      */
     public prependOnceListener(...args: any[]): Paparazzo {
-        return this.on.call(this, args[0], args[1], true, true);
+        if (isObject(args[0])) {
+            return this.on.call(this, args[0], true, true);
+        } else {
+            return this.on.call(this, args[0], args[1], true, true);
+        }
     }
 
     /**

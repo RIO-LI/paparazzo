@@ -108,15 +108,24 @@ var Paparazzo = (function () {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        this.on.call(this, args[0], args[1], args[2], true);
-        return this;
+        if (isObject(args[0])) {
+            return this.on.call(this, args[0], args[1], true);
+        }
+        else {
+            return this.on.call(this, args[0], args[1], args[2], true);
+        }
     };
     Paparazzo.prototype.prependOnceListener = function () {
         var args = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        return this.on.call(this, args[0], args[1], true, true);
+        if (isObject(args[0])) {
+            return this.on.call(this, args[0], true, true);
+        }
+        else {
+            return this.on.call(this, args[0], args[1], true, true);
+        }
     };
     Paparazzo.prototype.once = function () {
         var args = [];
