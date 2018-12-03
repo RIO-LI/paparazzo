@@ -12,6 +12,10 @@ interface IEventMapItem {
     [propName: string]: any;
 }
 
+interface IEventHandlersMap {
+    [propName: string]: EventHandler[] | EventHandler;
+}
+
 // Paparazzo实例对象配置类型
 interface IConfig {
     separator?: string; // 事件名分隔符
@@ -143,14 +147,14 @@ export class Paparazzo {
      * @param once 是否只监听一次,true 表示是，false表示不是
      * @param prepend 是否将处理器添加到该事件处理器队列的最前方，true 表示是，false表示不是，默认为false
      */
-    public on(eventHandlersMap: IEventsMap, once?: boolean, prepend?: boolean): Paparazzo;
+    public on(eventHandlersMap: IEventHandlersMap, once?: boolean, prepend?: boolean): Paparazzo;
 
     /**
      * 对指定事件进行监听
      */
     public on(...args: any[]): Paparazzo {
         if (isObject(args[0])) {
-            const eventsMap: { [propName: string]: EventHandler[] | EventHandler } = args[0];
+            const eventsMap: IEventHandlersMap = args[0];
             const once: boolean = !!args[1];
             const prepend: boolean = !!args[2];
             Object.keys(eventsMap).forEach((eventName: string) => {
@@ -179,7 +183,7 @@ export class Paparazzo {
      * @param eventHandlersMap 事件集合对象，键为要监听的事件名，值为对应事件处理器
      * @param once 是否只监听一次
      */
-    public prependListener(eventHandlersMap: IEventsMap, once?: boolean): Paparazzo;
+    public prependListener(eventHandlersMap: IEventHandlersMap, once?: boolean): Paparazzo;
 
     /**
      * 对事件进行监听，并将处理器添加到该事件处理器队列的最前方
@@ -200,13 +204,13 @@ export class Paparazzo {
      * 对事件进行一次性监听，并将处理器添加到该事件处理器队列的最前方
      * @param eventHandlersMap 事件集合对象，键为要监听的事件名，值为对应事件处理器
      */
-    public prependOnceListener(eventHandlersMap: IEventsMap): Paparazzo;
+    public prependOnceListener(eventHandlersMap: IEventHandlersMap): Paparazzo;
 
     /**
      * 对事件进行一次性监听，并将处理器添加到该事件处理器队列的最前方
      */
     public prependOnceListener(...args: any[]): Paparazzo {
-        return this.prependListener.call(this, args[0], args[1], true, true);
+        return this.on.call(this, args[0], args[1], true, true);
     }
 
     /**
@@ -220,7 +224,7 @@ export class Paparazzo {
      * 对事件集合进行监听
      * @param eventHandlersMap 事件集合对象，键为要监听的事件名，值为对应事件处理器
      */
-    public once(eventHandlersMap: IEventsMap): Paparazzo;
+    public once(eventHandlersMap: IEventHandlersMap): Paparazzo;
 
     /**
      * 对指定事件进行一次性监听，当事件触发后，事件将从事件处理中移除
@@ -235,7 +239,7 @@ export class Paparazzo {
      * @param eventName 事件名，如果需要对多个事件进行触发时，可以用事件分隔符隔开，默认为空格
      * @param payload 事件需要处理的数据
      */
-    public emmiter(eventName: string, payload?: any): Paparazzo {
+    public emit(eventName: string, payload?: any): Paparazzo {
         return this.processEvents(eventName, (name: string, handler: EventHandler, payload: any) => {
             handler(payload);
         }, payload);
