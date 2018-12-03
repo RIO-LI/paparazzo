@@ -72,32 +72,103 @@ const pz = new Paparazzo();
 
 -------------------------------------------------------------
 
+```javascript
+
+const Paparazzo = require("hk-paparazzo").Paparazzo;
+const pz = new Paparazzo();
+
+// observe `marry` event, and one handler
+pz.on('marry', (data) => {
+    // you want to da
+});
+
+// continue to  observe `marry` event, and  handlers
+pz.on('marry', [(data) => {
+    // you want to da
+}, (data) => {
+    // you want to da
+}])
+
+// observe `gossip` and `affair` simultaneously,and add handlers
+pz.on('gossip affair', [(data) => {
+    // the parameter that handler receives is send from Paparazzo.emmiter() method
+    console.log(`if you dispatch gossip or affair event, this function will be called`);
+},(data) => {
+    console.log(`if you dispatch gossip or affair event, this function will be called`);
+}]);
+
+// dispatch multiple events, and send data
+pz.emmiter('gossip affair', {name: 'XXX'});
+
+// observe a event at a time，after the event has dispatched, the event will be remove from the observe event list
+pz.once('sleep', (data) => {
+    console.log(`${data} is already asleep`);
+});
+
+pz.emmiter('sleep', {name: 'XXX'});
+
+// give up watching an event
+pz.off('marry');
+
+// give up watching some events
+pz.off('gossip affair');
+
+```
+
+-------------------------------------------------------------
+
+## Type & Interface
+--------------------------------------------
+> the paparazzo was written by typescript,the static type or interface and help you to understand what params the method want and what will be return from the method
+
+```typescript
+// the type of event handler
+type EventHandler = (payload?: any) => void;
+
+interface IEventsMap {
+    [propName: string]: IEventMapItem[];
+}
+
+interface IEventMapItem {
+    handler?: EventHandler;
+    originHandler?: EventHandler;
+    [propName: string]: any;
+}
+
+interface IConfig {
+    separator?: string;
+    [propName: string]: any;
+}
+```
 
 ## API
 
 -----------------------------------------------
+#### constructor(config:IConfig)
 
-### on(eventName, handlers, [once], [prepend])
+#### on(eventName: string, handlers: EventHandler[] | EventHandler, once?: boolean, prepend?: boolean): Paparazzo;
 
-### on(eventHandlersMap, [once], [prepend])
+#### on(eventHandlersMap: IEventsMap, once?: boolean, prepend?: boolean): Paparazzo;
 
-### once(eventName, handlers)
+#### prependListener(eventName: string, handlers: EventHandler[] | EventHandler, once?: boolean): Paparazzo;
 
-### once(eventHandlersMap)
+#### prependListener(eventHandlersMap: IEventsMap, once?: boolean): Paparazzo;
 
-### emmiter(eventName, [payload]);
+#### prependOnceListener(eventName: string, handlers: EventHandler[] | EventHandler): Paparazzo;
+    
+#### prependOnceListener(eventHandlersMap: IEventsMap): Paparazzo;
 
-### off(eventName, [handlers]);
+#### once(eventName: string, handlers: EventHandler[] | EventHandler): Paparazzo;
 
-### prependListener(eventName, handlers, [once])
+#### once(eventHandlersMap: IEventsMap): Paparazzo;
 
-### prependListener(eventHandlersMap, [once])
+#### emmiter(eventName: string, payload?: any): Paparazzo;
 
-### prependOnceListener(eventName, handlers)
+#### off(eventName: string, handler?: EventHandler[] | EventHandler): Paparazzo;
 
-### prependOnceListener(eventHandlersMap)
+#### eventNames(): string[];
 
-### eventNames()
+#### listeners(eventName: string): EventHandler[];
 
-### listeners(eventName)
+#### listeners(eventName)
 
