@@ -22,7 +22,7 @@
     "release:major": "npm run clean && npm version major",
     "test": "karma start"
   },
-  "version": "0.0.7",
+  "version": "0.0.8",
   "dependencies": {},
   "devDependencies": {
     "istanbul": "^0.4.5",
@@ -51,5 +51,13 @@
     "@types/sinon-chai": "^2.7.27"
   },
   "license": "MIT",
-  "homepage": "https://github.com/RIO-LI/paparazzo"
+  "homepage": "https://github.com/RIO-LI/paparazzo",
+  "keywords": [
+    "events",
+    "EventEmitter",
+    "emitter",
+    "pub",
+    "sub",
+    "observe"
+  ]
 }

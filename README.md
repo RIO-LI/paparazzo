@@ -1,11 +1,39 @@
 # paparazzo
 
+* [Synopsis](#Synopsis)
+* [install](#install)
+* [How to use](#HowToUse)
+  * [Direct `<script>` Include](#DirectScriptInclude)
+  * [CMD](#CMD)
+  * [AMD](#AMD)
+  * [ES Module](#ESModule)
+* [Features & Usage](#Features&Usage)
+* [Type & Interface](#Type&Interface)
+* [API](#API)
+  * [constructor([config])](#api-constructor)
+  * [on(eventName, handlers, [once], [prepend])](#api-on-1)
+  * [on(eventHandlersMap, [once], [prepend])](#api-on-2)
+  * [prependListener(eventName, handlers, [once])](#api-prependListener-1)
+  * [prependListener(eventHandlersMap,[once])](#api-prependListener-2)
+  * [prependOnceListener(eventName, handlers)](#api-prependOnceListener-1)
+  * [prependOnceListener(eventHandlersMap)](#api-prependOnceListener-2)
+  * [once(eventName, handlers)](#api-once-1)
+  * [once(eventHandlersMap)](#api-once-2)
+  * [emit(eventName, [payload])](#api-emit)
+  * [off(eventName, [handler])](#api-off)
+  * [eventNames()](#api-eventNames)
+  * [listeners(eventName)](#api-listeners)
+
+<a name='Synopsis'></a>
+
 ## Synopsis
 > Paparazzo is a simple, elegant and powerful event module that helps you quickly observe specific events, just like a paparazzi tracking celebrities.The code is written using the TypeScript approaches.But it have been converted into UMD module and ES5 formate code that can run in nodejs and browser.The most API style likes the Nodejs's Event module.If you are very skilled at Nodejs's Event module, you can get started quickly. 
 
 ---------------------------------------------------------------
 
-## Dependencies
+<a name='install'></a>
+
+## install
 There are no dependencies. You need only npm installed and just run npm install to grab the development dependencies.All you need to do is run this command:
 
 ```bash
@@ -14,11 +42,16 @@ npm install --save hk-paparazzo
 
 ---------------------------------------------------------------
 
+<a name='HowToUse'></a>
+
 ## How to use
+
+<a name='DirectScriptInclude'></a>
+
 ### Direct `<script>` Include
 
-You can download the production release from `https://github.com/RIO-LI/paparazzo/releases/download/0.06/paparazzo.js`.
-You can download the development release from `https://github.com/RIO-LI/paparazzo/releases/download/0.06/paparazzo.min.js`.
+You can download the production release from 
+`https://github.com/RIO-LI/paparazzo/releases/latest`
 
 Add them to your project directory.For example, If you put it in `lib/paparazzo`, so you can include `paparazzo` in the html as same as below:
 
@@ -39,6 +72,8 @@ var pz = new Paparazzo();
 
 ---------------------------------------------------------
 
+<a name='CMD'></a>
+
 ### CMD
 
 ```javascript 
@@ -47,6 +82,8 @@ const pz = new Paparazzo();
 ```
 
 ----------------------------------------------------------
+
+<a name='AMD'></a>
 
 ### AMD
 ```javascript
@@ -59,6 +96,8 @@ const pz = new Paparazzo();
 
 -------------------------------------------------------------
 
+<a name='ESModule'></a>
+
 ### ES Module
 
 ```javascript
@@ -67,6 +106,8 @@ const pz = new Paparazzo();
 ```
 
 -------------------------------------------------------------
+
+<a name='Features&Usage'></a>
 
 ## Features & Usage
 
@@ -117,6 +158,8 @@ pz.off('gossip affair');
 
 -------------------------------------------------------------
 
+<a name='Type&Interface'></a>
+
 ## Type & Interface
 --------------------------------------------
 > the paparazzo was written by typescript,the static type or interface and help you to understand what params the method want and what will be return from the method
@@ -140,10 +183,15 @@ interface IConfig {
 }
 ```
 
+<a name='API'></a>
+
 ## API
 
 -----------------------------------------------
-#### constructor(config:IConfig):Paparazzo
+
+<a name='api-constructor'></a>
+
+#### constructor(config?:IConfig):Paparazzo
 the constructor of Paparazzo class, it has one parameter, the configuration of Paparazzo instance
 
 **Example** 
@@ -172,6 +220,8 @@ hkPz.on('sleep:eat', (data) => {
 hkPz.emit('sleep:eat', {name: 'XXX'});
 
 ```
+
+<a name='api-on-1'></a>
 
 #### on(eventName: string, handlers: EventHandler[] | EventHandler, once?: boolean, prepend?: boolean): Paparazzo;
 
@@ -233,6 +283,8 @@ pz.emit('marry', {man: 'XXX', women: 'XXX'});
 
 ```
 
+<a name='api-on-2'></a>
+
 #### on(eventHandlersMap: IEventHandlersMap, once?: boolean, prepend?: boolean): Paparazzo;
 
 > Adds the listener function to the listeners array for the event named eventName
@@ -258,6 +310,8 @@ pz.on({
     }]
 });
 ```
+
+<a name='api-prependListener-1'></a>
 
 #### prependListener(eventName: string, handlers: EventHandler[] | EventHandler, once?: boolean): Paparazzo;
 
@@ -287,6 +341,8 @@ pz.prependListener('marry', (data) => {
     // this listener will be invoked when the marry event triggered
 });
 ```
+
+<a name='api-prependListener-2'></a>
 
 #### prependListener(eventHandlersMap: IEventHandlersMap, once?: boolean): Paparazzo;
 
@@ -324,6 +380,8 @@ pz.prependListener({
 });
 ```
 
+<a name='api-prependOnceListener-1'></a>
+
 #### prependOnceListener(eventName: string, handlers: EventHandler[] | EventHandler): Paparazzo;
 
 > Adds a one-time listener function for the event named eventName to the beginning of the listeners array. The next time eventName is triggered, this listener is removed, and then invoked.
@@ -346,6 +404,8 @@ pz.emit('eat');
 // the listener has been removed, so there won't be any effect.
 pz.emit('eat');
 ```
+
+<a name='api-prependOnceListener-2'></a>
 
 #### prependOnceListener(eventHandlersMap: IEventHandlersMap): Paparazzo;
 
@@ -380,6 +440,8 @@ pz.prependOnceListener({
 
 ```
 
+<a name='api-once-1'></a>
+
 #### once(eventName: string, handlers: EventHandler[] | EventHandler): Paparazzo;
 > Adds  one-time listener functions for events. The next time event is triggered, listeners are removed and then invoked
 
@@ -403,6 +465,8 @@ pz.emit('eat sleep');
 
 ```
 
+<a name='api-once-2'></a>
+
 #### once(eventHandlersMap: IEventHandlersMap): Paparazzo;
 > Adds  one-time listener functions for events. The next time event is triggered, listeners are removed and then invoked
 
@@ -420,6 +484,8 @@ pz.once({
 pz.emit('sleep');
 
 ```
+
+<a name='api-emit'></a>
 
 #### emit(eventName: string, payload?: any): Paparazzo;
 > Synchronously calls each of the listeners registered for events
@@ -446,6 +512,8 @@ pz.emit('eat');
 // trigger multiple events at the same time
 pz.emit('sleep eat', {});
 ```
+
+<a name='api-off'></a>
 
 #### off(eventName: string, handler?: EventHandler[] | EventHandler): Paparazzo;
 > Removes the specified listener from the listener array for events
@@ -474,6 +542,8 @@ pz.off('eat', doSomething);
 pz.off('eat')
 ```
 
+<a name='api-eventNames'></a>
+
 #### eventNames(): string[];
 > Returns an array listing the events for which the emitter has registered listeners
 
@@ -481,6 +551,8 @@ pz.off('eat')
 ```javascript
 pz.eventNames('eat'); 
 ```
+
+<a name='api-listeners'></a>
 
 #### listeners(eventName: string): EventHandler[];
 > Returns a copy of the array of listeners for the event named eventName
