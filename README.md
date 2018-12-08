@@ -120,14 +120,14 @@ const pz = new Paparazzo();
 
 // observe `marry` event, and one handler
 pz.on('marry', (data) => {
-    // you want to da
+    // you want to do
 });
 
 // continue to  observe `marry` event, and  handlers
 pz.on('marry', [(data) => {
-    // you want to da
+    // you want to do
 }, (data) => {
-    // you want to da
+    // you want to do
 }]);
 
 // observe `gossip` and `affair` simultaneously,and add handlers
